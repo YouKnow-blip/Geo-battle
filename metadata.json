@@ -1,0 +1,8 @@
+{
+  "name": "Geo-Battle Arena",
+  "description": "An interactive Geoguessr-style game where players explore 360° panoramas, place guesses on world maps, and split into Red and Blue teams for coordinate guess-battles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

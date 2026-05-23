@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net (Pillar 1)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions for validation
+    function isValidId(id) {
+      return id is string && id.size() <= 64;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidLobby(data) {
+      return data.id is string && data.id.size() <= 64 &&
+             data.hostId is string && data.hostId.size() <= 64 &&
+             data.status is string && (data.status == 'lobby' || data.status == 'playing' || data.status == 'round-results' || data.status == 'ended') &&
+             data.currentRound is int && data.currentRound >= 1 &&
+             data.maxRounds is int && data.maxRounds >= 1 &&
+             data.currentLocationId is string && data.currentLocationId.size() <= 128 &&
+             data.elapsedTime is int &&
+             data.blueScore is int &&
+             data.redScore is int &&
+             data.createdAt is int &&
+             data.players is map &&
+             data.players.keys().size() <= 4;
+    }
+
+    // Match block for the lobbies collection (Pillar 1)
+    match /lobbies/{lobbyId} {
+      allow get: if isValidId(lobbyId);
+      allow list: if false; // Protect matches against list queries (scraping)
+
+      // Lobby Creation Rules
+      allow create: if isValidId(lobbyId) && 
+                      isValidLobby(incoming()) && 
+                      incoming().status == 'lobby' &&
+                      incoming().id == lobbyId &&
+                      incoming().createdAt <= request.time.toMillis() + 60000;
+
+      // Lobby Update Rules with Action constraints
+      allow update: if isValidId(lobbyId) &&
+                      isValidLobby(incoming()) &&
+                      incoming().id == existing().id &&
+                      incoming().createdAt == existing().createdAt;
+
+      // Client deletion is strictly prohibited to keep lobbies intact
+      allow delete: if false;
+    }
+  }
+}

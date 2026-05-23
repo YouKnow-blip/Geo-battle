@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "lobby": {
+      "title": "Lobby",
+      "description": "Represents a multiplayer or solo geoguessr game lobby",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "hostId": { "type": "string" },
+        "players": { "type": "object" },
+        "status": { "type": "string", "enum": ["lobby", "playing", "round-results", "ended"] },
+        "currentRound": { "type": "integer" },
+        "maxRounds": { "type": "integer" },
+        "currentLocationId": { "type": "string" },
+        "elapsedTime": { "type": "integer" },
+        "blueScore": { "type": "integer" },
+        "redScore": { "type": "integer" },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["id", "hostId", "players", "status", "currentRound", "maxRounds", "currentLocationId", "elapsedTime", "blueScore", "redScore", "createdAt"]
+    }
+  },
+  "firestore": {
+    "lobbies/{lobbyId}": {
+      "schema": "lobby",
+      "description": "Collection of game lobbies"
+    }
+  }
+}
