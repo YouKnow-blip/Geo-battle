@@ -44,6 +44,7 @@ export interface GameLocation {
   name: string;
   country: string;
   description: string;
+  imageUrl?: string;
 }
 
 export interface RoundGuess {
